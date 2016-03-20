@@ -4,14 +4,13 @@
 <meta charset=utf-8 >
 <title>Single Position Load JSON R1</title>
 <meta name=viewport content='width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui' >
-<meta name=description content='Three.js template for Leap Motion devices.
-The simplest template possible?
-A single pointing mesh - attached to the first index finger that appears.
-Use buttons to select, box, cylinder, prolate spheroid or arrow pointer.
-All created using simple Three.js geometry.
+<meta name=description content='
+* Three.js template for Leap Motion devices.
+* A single pointing mesh - attached to the first index finger that appears.
+* Use buttons to select and load a variety of 3D models as left-handed pointers.
 ' >
 <meta name=keywords content='Leap Motion,WebGL,Three.js,Tween.js,JavaScript,GitHub,FOSS,3D,STEM' >
-<meta name=date content='2016-03-18' >
+<meta name=date content='2016-03-19' >
 </head>
 <body>
 <!--
@@ -30,9 +29,9 @@ All created using simple Three.js geometry.
 	var fileNames =  [
 
 		'#http://jaanga.github.io/3d-models/js/hands/left-hand.js#sx=5#sy=5#sz=5',
-		'#http://jaanga.github.io/3d-models/js/hands/mano-left-01.js#sx=3#sy=3#sz=3',
-		'#http://jaanga.github.io/3d-models/js/hands/robo-artsy-01.js#sx=-3#sy=3#sz=3',
-		'#http://jaanga.github.io/3d-models/js/hands/robot-left-01.js#sx=3#sy=3#sz=3',
+		'#http://jaanga.github.io/3d-models/js/hands/mano-left-01.js#sx=5#sy=5#sz=5',
+		'#http://jaanga.github.io/3d-models/js/hands/robo-artsy-01.js#sx=-8#sy=8#sz=8',
+		'#http://jaanga.github.io/3d-models/js/hands/robot-left-01.js#sx=5#sy=5#sz=5',
 		'#http://jaanga.github.io/3d-models/js/hands/skeleton-left.js#sx=10#sy=10#sz=10',
 		'#http://jaanga.github.io/3d-models/js/hands/w-hand-02-01.js#sx=-10#sy=10#sz=10'
 
@@ -71,7 +70,7 @@ All created using simple Three.js geometry.
 
 			'<h2>' +
 			'	<a href="" >' + document.title + '</a> ' +
-			'	<a href=http://jaanga.github.io/gestification-r3/ >&#x24D8;</a>' +
+			'	<a href=http://jaanga.github.io/gestification3/ >&#x24D8;</a>' +
 			'</h2>' +
 			'<p>You can load 3D models and use these as points.</p>' +
 			'<p><button onclick=selectHand(0); >Left Hand</button> ' +
