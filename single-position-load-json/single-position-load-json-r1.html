@@ -2,7 +2,7 @@
 <html lang=en >
 <head>
 <meta charset=utf-8 >
-<title>Single Position Select Mesh R1</title>
+<title>Single Position Load JSON R1</title>
 <meta name=viewport content='width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui' >
 <meta name=description content='Three.js template for Leap Motion devices.
 The simplest template possible?
@@ -22,9 +22,23 @@ All created using simple Three.js geometry.
 <script src=http://rawgit.com/mrdoob/three.js/dev/build/three.min.js ></script>
 <script src=http://rawgit.com/mrdoob/three.js/dev/examples/js/controls/OrbitControls.js ></script>
 <script src=http://rawgit.com/mrdoob/three.js/dev/examples/js/libs/stats.min.js ></script>
+<script src=http://rawgit.com/mrdoob/three.js/dev/src/loaders/JSONLoader.js ></script>
 
 <script src=http://js.leapmotion.com/leap-0.6.4.js ></script>
 <script>
+
+	var fileNames =  [
+
+		'#http://jaanga.github.io/3d-models/js/hands/left-hand.js#sx=5#sy=5#sz=5',
+		'#http://jaanga.github.io/3d-models/js/hands/mano-left-01.js#sx=3#sy=3#sz=3',
+		'#http://jaanga.github.io/3d-models/js/hands/robo-artsy-01.js#sx=-3#sy=3#sz=3',
+		'#http://jaanga.github.io/3d-models/js/hands/robot-left-01.js#sx=3#sy=3#sz=3',
+		'#http://jaanga.github.io/3d-models/js/hands/skeleton-left.js#sx=10#sy=10#sz=10',
+		'#http://jaanga.github.io/3d-models/js/hands/w-hand-02-01.js#sx=-10#sy=10#sz=10'
+
+	]
+
+	var parameters = new THREE.Object3D();
 
 	var loop;
 	var pointer;
@@ -59,12 +73,13 @@ All created using simple Three.js geometry.
 			'	<a href="" >' + document.title + '</a> ' +
 			'	<a href=http://jaanga.github.io/gestification-r3/ >&#x24D8;</a>' +
 			'</h2>' +
-			'<p>You can build a variety of pointers just using Three.js primitives.</p>' +
-			'<p><button onclick=selectCylinder(); >Cylinder Pointer</button> ' +
-			'<p><button onclick=selectProlateSpheroid(); >Prolate Spheroid Pointer</button> ' +
-			'<p><button onclick=selectArrow(); >Arrow Pointer</button> ' +
-			'<p><button onclick=selectBox(); >Box Pointer</button> ' +
-
+			'<p>You can load 3D models and use these as points.</p>' +
+			'<p><button onclick=selectHand(0); >Left Hand</button> ' +
+			'<p><button onclick=selectHand(1); >Mano Left</button> ' +
+			'<p><button onclick=selectHand(2); >Robo Artsy</button> ' +
+			'<p><button onclick=selectHand(3); >Robot Left</button> ' +
+			'<p><button onclick=selectHand(4); >Skeleton Hand</button> ' +
+			'<p><button onclick=selectHand(5); >W Hand</button> ' +
 
 			'<div id=info ></div>' +
 
@@ -83,10 +98,10 @@ All created using simple Three.js geometry.
 		document.body.appendChild( renderer.domElement );
 
 		camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 5000 );
-		camera.position.set( -200, 300, 300 );
+		camera.position.set( 200, 300, 300 );
 
 		controls = new THREE.OrbitControls( camera, renderer.domElement );
-		controls.target.set( -50, 150, 50 );
+		controls.target.set( 0, 150, 0 );
 		controls.maxDistance = 800;
 
 		scene = new THREE.Scene();
@@ -107,7 +122,92 @@ All created using simple Three.js geometry.
 
 // assets
 
-		selectBox();
+		selectHand();
+
+	}
+
+	function selectHand( index ) {
+
+		var hashes, hash, parameter, value;
+		var d2r = Math.PI / 180;
+
+		var index = index ? index : 1;
+
+		hashes = location.hash ? location.hash.split( '#' ) : fileNames[ index ].split( '#' );
+
+		for ( var i = 2; i < hashes.length; i++ ) {
+
+			hash = hashes[ i ];
+			parameter = hash.slice( 0, 2 );
+			value = parseFloat( hash.slice( 3 ) );
+
+			switch( parameter ) {
+
+				case 'rx':
+					parameters.rotation.x = value * d2r; break;
+				case 'ry':
+					parameters.rotation.y = value * d2r; break;
+				case 'rz':
+					parameters.rotation.z = value * d2r; break;
+				case 'px':
+					parameters.position.x = value; break;
+				case 'py':
+					parameters.position.y = value; break;
+				case 'pz':
+					parameters.position.z = value; break;
+				case 'sx':
+					parameters.scale.x = value; break;
+				case 'sy':
+					parameters.scale.y = value; break;
+				case 'sz':
+					parameters.scale.z = value; break;
+				case 'cx':
+					camera.position.x = value;; break;
+				case 'cy':
+					camera.position.y = value;; break;
+				case 'cz':
+					camera.position.z = value;; break;
+				case 'tx':
+					controls.target.x = value;; break;
+				case 'tx':
+					controls.target.x = value;; break;
+				case 'ty':
+					controls.target.y = value;; break;
+				case 'tz':
+					controls.target.z = value;; break;
+				default:
+					console.log( 'oops' );
+
+			}
+
+		}
+
+		fileName = hashes[ 1 ];
+
+		loadJSONFileByURL( fileName );
+
+	}
+
+
+	function loadJSONFileByURL( fileName ) {
+
+		var loader = new THREE.JSONLoader();
+		loader.crossOrigin = 'anonymous';
+		loader.load( fileName, function ( geometry ) {
+
+			scene.remove( pointer );
+			material = new THREE.MeshNormalMaterial( { side: 2 } );
+			pointer = new THREE.Mesh( geometry, material );
+
+			pointer.scale.copy( parameters.scale );
+			pointer.rotation.copy( parameters.rotation );
+			pointer.position.copy( parameters.position );
+
+			scene.add( pointer );
+
+			info.innerHTML = 'File name: ' + fileName.split('/').pop() + '<br>' + '';
+
+		} );
 
 	}
 
@@ -117,53 +217,6 @@ All created using simple Three.js geometry.
 		camera.updateProjectionMatrix();
 
 		renderer.setSize( window.innerWidth, window.innerHeight );
-
-	}
-
-	function selectCylinder() {
-
-		scene.remove( pointer );
-		geometry = new THREE.CylinderGeometry( 8, 10, 100, 24 );
-		geometry.applyMatrix( new THREE.Matrix4().makeRotationX( -0.5 * Math.PI ) );
-		material = new THREE.MeshNormalMaterial();
-		pointer = new THREE.Mesh( geometry, material );
-		scene.add( pointer );
-
-	}
-
-	function selectProlateSpheroid() {
-
-		scene.remove( pointer );
-		geometry = new THREE.SphereGeometry( 1, 50, 25, 0, 2 * Math.PI, 0, 2 );
-		geometry.applyMatrix( new THREE.Matrix4().makeRotationX( -0.5 * Math.PI ) );
-		geometry.applyMatrix( new THREE.Matrix4().makeScale( 5, 5, 100 ) );
-		material = new THREE.MeshNormalMaterial( { side: 2 } );
-		pointer = new THREE.Mesh( geometry, material );
-		scene.add( pointer );
-
-	}
-
-	function selectArrow() {
-
-		scene.remove( pointer );
-
-		geometry = new THREE.CylinderGeometry( 10, 5, 80, 3 );
-		geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 50, 0 ) );
-		geometry.merge( new THREE.CylinderGeometry( 12, 0, 20, 3 ) );
-		geometry.applyMatrix( new THREE.Matrix4().makeRotationX( 0.5 * Math.PI ) );
-		material = new THREE.MeshNormalMaterial();
-		pointer = new THREE.Mesh( geometry, material );
-		scene.add( pointer );
-
-	}
-
-	function selectBox() {
-
-		scene.remove( pointer );
-		geometry = new THREE.BoxGeometry( 8, 8, 100 );
-		material = new THREE.MeshNormalMaterial();
-		pointer = new THREE.Mesh( geometry, material );
-		scene.add( pointer );
 
 	}
 
